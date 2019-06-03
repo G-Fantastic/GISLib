@@ -7,12 +7,20 @@
 
 /// 经纬度坐标点
 public struct GISLatLon {
-    public var latitude = 0.0   // 纬度
-    public var longitude = 0.0  // 经度
+    /// 纬度
+    public var latitude: Double
+    /// 经度
+    public var longitude: Double
     
-    public init(){ }
-    
-    public init(lat latitude: Double, lon longitude: Double){
+    public init(lat latitude: Double = 0.0, lon longitude: Double = 0.0){
+        if latitude < -90 || latitude > 90 {
+            fatalError("纬度范围必须为[-90, 90]")
+        }
+        
+        if longitude < -180 || longitude > 180 {
+            fatalError("经度范围必须为[-180, 180]")
+        }
+        
         self.latitude = latitude
         self.longitude = longitude
     }

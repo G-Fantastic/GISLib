@@ -8,6 +8,7 @@ import GISLib
 
 GISTools.printGISParams()
 
+
 // 测试 distance 方法
 print("测试 distance 方法")
 print(GISTools.distance(GISLatLon(lat: 0, lon: 0), GISLatLon(lat: 1, lon: 0)))          // 111194.927
@@ -57,4 +58,6 @@ print(GISTools.distanceWithAltitude(GISLatLon(lat: 0, lon: 0), GISLatLon(lat: 0,
 print(GISTools.distanceWithAltitude(GISLatLon(lat: 0, lon: 0), GISLatLon(lat: 0, lon: 2), 0, 5000))       // 222446.054     ➍
 // ➀ 与 ➊ 对比，➁ 与 ➋ 对比，➂ 与 ➌ 对比，➃ 与 ➍ 对比
 print("==============")
+
+
 

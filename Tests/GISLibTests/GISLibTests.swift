@@ -6,7 +6,7 @@ final class GISLibTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(GISLib().text, "Hello, World!")
+//        XCTAssertEqual(GISLib().text, "Hello, World!")
     }
 
     static var allTests = [
