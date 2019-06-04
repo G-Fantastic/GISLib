@@ -9,6 +9,8 @@ import GISLib
 GISTools.printGISParams()
 
 
+
+
 // 测试 distance 方法
 print("测试 distance 方法")
 print(GISTools.distance(GISLatLon(lat: 0, lon: 0), GISLatLon(lat: 1, lon: 0)))          // 111194.927
