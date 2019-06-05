@@ -72,26 +72,3 @@ var circle = GISCircle(GISLatLon(lat: -20.132, lon: 0.19032), 3000)
 try! circle.randomLatLon()
 
 
-func test() throws {
-    throw GISCircleError.randomLatLonOutCircleError("abcdef")
-}
-
-func test1() throws {
-    try test()
-    print("test1")
-}
-
-print("0.01%")
-
-do{
-    
-    try test1()
-    
-}catch GISCircleError.randomLatLonOutCircleError(let errorDescription){
-    print(errorDescription)
-}catch{
-    print(error)
-}
-
-print("kljfdlajlfk")
-
