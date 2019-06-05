@@ -5,6 +5,7 @@
 //  Created by GG on 2019/5/29.
 //
 import GISLib
+import Foundation
 
 GISTools.printGISParams()
 
@@ -97,16 +98,39 @@ fileprivate func test2(_ circle1: GISCircle) {
     }
 }
 
-func testRandomLatLon() {
-    let circle1 = GISCircle(GISLatLon(), 5000)
-    test1(circle1)  // 测试异常：radianOver2πError
-    test2(circle1)  // 测试异常：lengthOverRError
+fileprivate func test3(_ circle1: GISCircle) {
+    
     print(try! circle1.calculateLatLon(6.283185307179586, 0))  // 测试随机弧度为：2π 的处理
     print(try! GISCircle(GISLatLon(lat: 20.903299328, lon: 3.90139109423), 5000).calculateLatLon(2.01, 0))  // 测试随机长度为：0
     print(try! GISCircle(GISLatLon(lat: 90, lon: 3.90139109423), 5000).calculateLatLon(2.01, 0))  // 测试随机长度为：0，且圆心在极点
     print(try! GISCircle(GISLatLon(lat: 90, lon: 3.90139109423), 5000).calculateLatLon(2.01, 20))  // 圆心在极点
-    print(try! GISCircle(GISLatLon(lat: -90, lon: 0), 5000).calculateLatLon(2.01, 20))             // 圆心在极点
-    
+    print(try! GISCircle(GISLatLon(lat: -90, lon: 0), 5000).calculateLatLon(2.01, 20))       // 圆心在极点
+}
+
+func randomLen(_ r: Double) -> Double {
+    return sqrt(Double.random(in: 0...1)) * r
+}
+
+fileprivate func test4() {
+    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), 5000000).calculateLatLon(0, randomLen(5000000)))    // 随机弧度 = 0 或 = π
+    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), 5000000).calculateLatLon(3.141592653589793, randomLen(5000000)))  // 随机弧度 = 0 或 = π
+    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), 5000000).calculateLatLon(3.141592653589793, randomLen(5000000)))  // 随机弧度 = 0 或 = π
+    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), 5000000).calculateLatLon(0, randomLen(5000000)))   // 随机弧度 = 0 或 = π
+
+}
+fileprivate func test5() {
+    print(try! GISCircle(GISLatLon(lat: -89, lon: 0), 500000).calculateLatLon(2.01, 20))             // 圆心在极点
+    print(try! GISCircle(GISLatLon(lat: 89, lon: 0), 5000).calculateLatLon(2.01, 20))
+}
+
+
+func testRandomLatLon() {
+    let circle1 = GISCircle(GISLatLon(), 5000)
+//    test1(circle1)  // 测试异常：radianOver2πError
+//    test2(circle1)  // 测试异常：lengthOverRError
+//    test3(circle1)  // 特殊点测试
+    test4()           // 极点在圆内
+//    test5()           // 其他常规测试
     
     
     

@@ -106,6 +106,7 @@ extension GISCircle{
                 case rad where rad == 0 || rad == π:
                     logger.warning("随机弧度 = 0 或 = π")
                     randomLatLon = rad_0Orπ(rad, len, lenToPole)
+                    
                 case rad where rad > 0 && rad < π:
                     logger.warning("随机弧度 > 0 且 < π")
                     randomLatLon = rad_0Toπ(rad, len, lenToPole)
