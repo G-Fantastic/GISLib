@@ -54,6 +54,7 @@ extension GISCircle{
      * 圆内生成一个随机点
      *
      * 有概率生成的随机点不在圆内，当随机点不在圆内，将抛出异常
+     *
      */
     public func randomLatLon() throws -> GISLatLon{
         let randomRad = Double.random(in: 0...2 * π).roundOff(6)    // 随机弧度（必须 <= 2π）
@@ -68,8 +69,8 @@ extension GISCircle{
      * 不推荐使用，建议使用：randomLatLon() 方法，可在圆内生成真正的随机经纬度坐标点
      */
     public func calculateLatLon(_ radian: Double, _ len: Double) throws -> GISLatLon{
-        if radian > 2 * π { throw GISCircleError.radianOver2πError("radianOver2πError: 指定的弧度值rad不能 > 2π(\(2 * π)") }
-        if len > r { throw GISCircleError.lengthOverRError("lengthOverRError: 指定的长度len不能 > 圆的半径R(\(r!)") }
+        if radian > 2 * π { throw GISCircleError.radianOver2πError("radianOver2πError: 指定的弧度值rad不能 > 2π(\(2 * π))") }
+        if len > r { throw GISCircleError.lengthOverRError("lengthOverRError: 指定的长度len不能 > 圆的半径R(\(r!)米)") }
         
         let rad = radian == 2 * π ? 0 : radian      // 如果弧度是2π，直接置为0，因为2π和0其实是同一个弧度
         
@@ -78,44 +79,54 @@ extension GISCircle{
         
         let (absLat, absLon) = (abs(centerLatLon.latitude), abs(centerLatLon.longitude))
         logger.info("纬度绝对值：\(absLat) *** 经度绝对值：\(absLon)")
-        if len == 0 { logger.warning("随机长度为：0，圆心即为随机点。");  return centerLatLon }
-        if absLat == 90 {
+        
+        
+        var randomLatLon = GISLatLon()
+        let switchTuple = (len, absLat, centerLatLon.latitude!)
+        
+        
+        switch switchTuple {
+        case (0, _, _):
+            logger.warning("随机长度为：0，圆心即为随机点。")
+            randomLatLon = GISLatLon(lat: centerLatLon.latitude.roundOff(6), lon: centerLatLon.longitude.roundOff(6))
+            
+        case (_, 90, _):
             logger.warning("当前纬度的绝对值为：90，也就是圆心在极点。")
-            let randomLatLon = randomForLat90(len)
-            try verifyRandomLatLon(randomLatLon, len)
-            return randomLatLon
-        }
-        if centerLatLon.latitude > 0 {
-            logger.warning("当前圆心在北半球")
-            let lenToNorthPole = GISTools.distance(centerLatLon, GISLatLon(lat: 90, lon: 0))
-            logger.info("圆心到北极点的距离：\(lenToNorthPole)")
-            if r > lenToNorthPole{
-                logger.warning("圆心在北半球且北极点在圆内")
+            randomLatLon = randomForLat90(len)
+            
+        case (_, _, let centerLat) where centerLat != 0:
+            centerLat > 0 ? logger.warning("当前圆心在北半球") : logger.warning("当前圆心在南半球")
+            let lenToPole = centerLat > 0 ? GISTools.distance(centerLatLon, GISLatLon(lat: 90, lon: 0))
+                                          : GISTools.distance(centerLatLon, GISLatLon(lat: -90, lon: 0))
+            
+            logger.info("圆心到最近的极点的距离：\(lenToPole)")
+            if r > lenToPole{
+                centerLat > 0 ? logger.warning("圆心在北半球且北极点在圆内") : logger.warning("圆心在南半球且南极点在圆内")
                 switch(rad){
                 case rad where rad == 0 || rad == π:
                     logger.warning("随机弧度 = 0 或 = π")
-                    let randomLatLon = rad_0Orπ_NSPole(rad, len, lenToNorthPole)
-                    try verifyRandomLatLon(randomLatLon, len)
-                    return randomLatLon
-                    
+                    randomLatLon = rad_0Orπ(rad, len, lenToPole)
                 case rad where rad > 0 && rad < π:
                     logger.warning("随机弧度 > 0 且 < π")
-                    let randomLatLon = rad_0Toπ_NPole(rad, len, lenToNorthPole)
+                    randomLatLon = rad_0Toπ(rad, len, lenToPole)
+                    
                 default:
                     logger.warning("随机弧度 > π 且 < 2π")
-                }
-                if rad == 0 || rad == π {
-                    
+                    randomLatLon = rad_πTo2π(rad, len, lenToPole)
                 }
             }
+            
+        default:
+            logger.warning("普通算法取随机点")
+            randomLatLon = commonCase(rad, len)
         }
         
+        if len != 0 {
+            try verifyRandomLatLon(randomLatLon, len)   // 校验生成的经纬度是否有效（是否在圆内）
+        }
         
-        return GISLatLon()
+        return randomLatLon
     }
-    
-    
-    
     
 }
 
@@ -125,7 +136,7 @@ extension GISCircle{
     private func randomForLat90(_ len: Double) -> GISLatLon {
         let randomDeg = Double(Int.random(in: 0...36000))  // 36000个角度
         let randomLon = randomDeg < 18000 ? randomDeg / 100.0 : (18000 - randomDeg) / 100.0
-        logger.info("圆心在极点时，生成的随机角度：\(randomDeg) *** 随机经度：\(randomLon)")
+        logger.info("圆心在极点时，生成的随机角度：\(randomDeg / 100) *** 随机经度：\(randomLon)")
         let latOffset = (len / DEG2M).roundOff(6)
         let randomLat = centerLatLon.latitude == 90 ? 90 - latOffset : latOffset - 90
         logger.info("圆心在极点时，生成的随机纬度：\(randomLat)")
@@ -133,8 +144,10 @@ extension GISCircle{
         return GISLatLon(lat: randomLat, lon: randomLon)
     }
     
-    /// 随机弧度 = 0 或 π （南北半球均适用）
-    private func rad_0Orπ_NSPole(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
+    /**
+     * 随机弧度rad: rad = 0 或 rad = π
+     */
+    private func rad_0Orπ(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
         let desToPole = sqrt(lenToPole * lenToPole + len * len)
         logger.info("随机点到最近的极点的距离：\(desToPole)")
         let latOffset = (desToPole / DEG2M).roundOff(6)
@@ -150,8 +163,20 @@ extension GISCircle{
     }
     
     
-    /// 随机弧度rad: 0 < rad < π （适用于北半球）
-    private func rad_0Toπ_NPole(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
+    /**
+     * 随机弧度rad: 0 < rad < π
+     *
+     * ⚠️⚠️⚠️（以下说明只针对本函数而言）：
+     *
+     * 由于只是要在圆内取一个随机点，所以对于随机弧度的取值是多少并不关心，因为本来就是随机的。因此，做如下约定：
+     *
+     * ➢ 圆心点在北半球或赤道时，圆心点与北极点的连线的弧度当作是 π/2 (90°)
+     *
+     * ➢ 圆心点在南半球时，圆心点与南极点的连线的弧度当作是 π/2 (90°)，而不是 3π/2 (270°)
+     *
+     * 也就是说，圆心点在南北半球采用相反的极坐标轴，但是这并不影响我们取随机经纬度坐标，反而对编写函数提供了很大的便利。
+     */
+    private func rad_0Toπ(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
         let radDiff90 = π/2 - rad
         let logStr = radDiff90 >= 0 ? "随机弧度rad: 0 < rad < π/2" : "随机弧度rad: π/2 < rad < π"
         logger.info("\(logStr)")
@@ -165,20 +190,78 @@ extension GISCircle{
         logger.info("\(logStr1)")
         
         let nearestPointTo90 = lenToPole * sin(abs(radDiff90))
-        logger.info("当前弧度下的线段到北极点的距离：\(nearestPointTo90)")
+        logger.info("当前弧度下的射线到最近的极点的距离：\(nearestPointTo90)")
         
-        let desToPole = sqrt(leftLen * leftLen + nearestPointTo90 * nearestPointTo90)  // 随机点到极点的距离
-        let randomLat = 90 - (desToPole / DEG2M).roundOff(6)
+        let desToPole = sqrt(leftLen * leftLen + nearestPointTo90 * nearestPointTo90)  // 随机点到最近极点的距离
+        let latOffset = (desToPole / DEG2M).roundOff(6)
+        let randomLat = centerLatLon.latitude > 0 ? 90 - latOffset : latOffset - 90
         
         let radOffset = asin(abs(leftLen) / desToPole)  // `超过`离极点最近的点之后，所偏移的经度
-        let lonOffset = (leftLen > 0 ? π/2 - abs(radDiff90) + radOffset : π/2 - abs(radDiff90) - radOffset) * RAD2DEG
+        var lonOffset = (leftLen > 0 ? π/2 - abs(radDiff90) + radOffset : π/2 - abs(radDiff90) - radOffset) * RAD2DEG
+        lonOffset = centerLatLon.latitude > 0 ? lonOffset : -lonOffset
         
         let tempLon = radDiff90 >= 0 ? centerLatLon.longitude + lonOffset : centerLatLon.longitude - lonOffset
         let randomLon = parseLonOver180(tempLon)
         
-        logger.info("经度偏移弧度：\(radOffset) *** 经度偏移角度：\(lonOffset) ")
+        logger.info("经度偏移弧度：\(radOffset) *** 经度偏移角度：\(lonOffset) *** 纬度偏移角度：\(latOffset)")
         logger.info("随机纬度：\(randomLat) *** 随机经度：\(randomLon)")
         
+        return GISLatLon(lat: randomLat, lon: randomLon)
+    }
+    
+    /**
+     * 随机弧度rad: π < rad < 2π
+     *
+     * ⚠️⚠️⚠️（以下说明只针对本函数而言）：
+     *
+     * 由于只是要在圆内取一个随机点，所以对于随机弧度的取值是多少并不关心，因为本来就是随机的。因此，做如下约定：
+     *
+     * ➢ 圆心点在北半球或赤道时，圆心点与北极点的连线的弧度当作是 π/2 (90°)
+     *
+     * ➢ 圆心点在南半球时，圆心点与南极点的连线的弧度当作是 π/2 (90°)，而不是 3π/2 (270°)
+     *
+     * 也就是说，圆心点在南北半球采用相反的极坐标轴，但是这并不影响我们取随机经纬度坐标，反而对编写函数提供了很大的便利。
+     */
+    private func rad_πTo2π(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
+        let radDiff270 = 3 * π / 2 - rad
+        let logStr = radDiff270 >= 0 ? "随机弧度rad: π < rad < 3π/2" : "随机弧度rad: 3π/2 < rad < 2π"
+        logger.info("\(logStr)")
+        
+        let cosLen = cos(abs(radDiff270)) * len
+        let sinLen = sin(abs(radDiff270)) * len
+        
+        let desToPole = sqrt(sinLen * sinLen + pow(lenToPole + cosLen, 2))  // // 随机点到圆心所在半球的极点的距离
+        let latOffset = (desToPole / DEG2M).roundOff(6)
+        let randomLat = centerLatLon.latitude > 0 ? 90 - latOffset : latOffset - 90
+        
+        let radOffset = asin(sinLen / desToPole)
+        let lonOffset = centerLatLon.latitude > 0 ? radOffset * RAD2DEG : -(radOffset * RAD2DEG)
+        
+        let tempLon = radDiff270 >= 0 ? centerLatLon.longitude - lonOffset : centerLatLon.longitude + lonOffset
+        let randomLon = parseLonOver180(tempLon)
+        
+        logger.info("经度偏移弧度：\(radOffset) *** 经度偏移角度：\(lonOffset) *** 纬度偏移角度：\(latOffset)")
+        logger.info("随机纬度：\(randomLat) *** 随机经度：\(randomLon)")
+        
+        return GISLatLon(lat: randomLat, lon: randomLon)
+    }
+    
+    /// 常规算法取随机点，适用于一般情形
+    private func commonCase(_ rad: Double, _ len: Double) -> GISLatLon {
+        let xOffset = (cos(rad) * len).roundOff(3)
+        let yOffset = (sin(rad) * len).roundOff(3)
+        logger.info("xOffset：\(xOffset) *** yOffset：\(yOffset)")
+        
+        let latOffset = yOffset / DEG2M
+        let randomLat = (latOffset + centerLatLon.latitude).roundOff(6)
+        
+        let lonOffset = xOffset / (DEG2M * cos(centerLatLon.latitude * DEG2RAD))
+        let tempLon = (lonOffset + centerLatLon.longitude).roundOff(6)
+        let randomLon = parseLonOver180(tempLon)
+        
+        logger.info("经度偏移角度：\(lonOffset) *** 纬度偏移角度：\(latOffset)")
+        logger.info("随机纬度：\(randomLat) *** 随机经度：\(randomLon)")
+
         return GISLatLon(lat: randomLat, lon: randomLon)
     }
     
@@ -230,4 +313,7 @@ public enum GISCircleError: Error {
     case lengthOverRError(String)
     case randomLatLonOutCircleError(String)
 }
+
+
+
 

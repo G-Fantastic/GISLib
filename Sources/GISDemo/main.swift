@@ -6,7 +6,7 @@
 //
 import GISLib
 
-//GISTools.printGISParams()
+GISTools.printGISParams()
 
 
 func testDistance() {
@@ -68,7 +68,51 @@ func testDistanceWithAltitude(){
 //testDistance()
 //testDistanceWithAltitude()
 
-var circle = GISCircle(GISLatLon(lat: -20.132, lon: 0.19032), 3000)
-try! circle.randomLatLon()
+
+fileprivate func test1(_ circle1: GISCircle) {
+    do{
+        try circle1.calculateLatLon(8, 0)
+    }catch GISCircleError.radianOver2πError(let msg){
+        print(msg)
+    }catch GISCircleError.lengthOverRError(let msg){
+        print(msg)
+    }catch GISCircleError.randomLatLonOutCircleError(let msg){
+        print(msg)
+    }catch{
+        print(error)
+    }
+}
+
+fileprivate func test2(_ circle1: GISCircle) {
+    do{
+        try circle1.calculateLatLon(2, 6000)
+    }catch GISCircleError.radianOver2πError(let msg){
+        print(msg)
+    }catch GISCircleError.lengthOverRError(let msg){
+        print(msg)
+    }catch GISCircleError.randomLatLonOutCircleError(let msg){
+        print(msg)
+    }catch{
+        print(error)
+    }
+}
+
+func testRandomLatLon() {
+    let circle1 = GISCircle(GISLatLon(), 5000)
+    test1(circle1)  // 测试异常：radianOver2πError
+    test2(circle1)  // 测试异常：lengthOverRError
+    print(try! circle1.calculateLatLon(6.283185307179586, 0))  // 测试随机弧度为：2π 的处理
+    print(try! GISCircle(GISLatLon(lat: 20.903299328, lon: 3.90139109423), 5000).calculateLatLon(2.01, 0))  // 测试随机长度为：0
+    print(try! GISCircle(GISLatLon(lat: 90, lon: 3.90139109423), 5000).calculateLatLon(2.01, 0))  // 测试随机长度为：0，且圆心在极点
+    print(try! GISCircle(GISLatLon(lat: 90, lon: 3.90139109423), 5000).calculateLatLon(2.01, 20))  // 圆心在极点
+    print(try! GISCircle(GISLatLon(lat: -90, lon: 0), 5000).calculateLatLon(2.01, 20))             // 圆心在极点
+    
+    
+    
+    
+}
+
+
+testRandomLatLon()
 
 
