@@ -57,7 +57,7 @@ extension GISCircle{
      *
      */
     public func randomLatLon() throws -> GISLatLon{
-        let randomRad = Double.random(in: 0...2 * π).roundOff(6)    // 随机弧度（必须 <= 2π）
+        let randomRad = Double.random(in: 0...π2).roundOff(6)    // 随机弧度（必须 <= 2π）
         let randomLen = (sqrt(Double.random(in: 0...1)) * r).roundOff(3) // 随机长度（必须 <= 圆的半径R）
         let gisLatLon = try calculateLatLon(randomRad, randomLen)
         return gisLatLon
@@ -67,13 +67,20 @@ extension GISCircle{
      * 在圆内指定弧度与长度，计算一个经纬度坐标
      *
      * 不推荐使用，建议使用：randomLatLon() 方法，可在圆内生成真正的随机经纬度坐标点
+     *
+     *  - parameters:
+     *    - radian: 弧度。⚠️由于Double精度问题，所以此函数内部对radian只取小数点后15位有效位
+     *    - len: 长度。
      */
     public func calculateLatLon(_ radian: Double, _ len: Double) throws -> GISLatLon{
-        if radian > 2 * π { throw GISCircleError.radianOver2πError("radianOver2πError: 指定的弧度值rad不能 > 2π(\(2 * π))") }
+        let roundRadian = radian.roundOff(15)
+        logger.info("弧度取15位有效位的结果为：\(roundRadian)")
+        if roundRadian > π2 { throw GISCircleError.radianOver2πError("radianOver2πError: 指定的弧度值rad不能 > 2π(\(π2))") }
         if len > r { throw GISCircleError.lengthOverRError("lengthOverRError: 指定的长度len不能 > 圆的半径R(\(r!)米)") }
         
-        let rad = radian == 2 * π ? 0 : radian      // 如果弧度是2π，直接置为0，因为2π和0其实是同一个弧度
+        let rad = roundRadian == π2 ? 0 : roundRadian      // 如果弧度是2π，直接置为0，因为2π和0其实是同一个弧度
         
+        logger.info("\(self)")
         logger.info("随机的弧度：\(rad) *** 随机的角度值：\(rad * RAD2DEG)")
         logger.info("随机的长度（随机点到圆心的距离）：\(len)")
         
@@ -178,7 +185,7 @@ extension GISCircle{
      * 也就是说，圆心点在南北半球采用相反的极坐标轴，但是这并不影响我们取随机经纬度坐标，反而对编写函数提供了很大的便利。
      */
     private func rad_0Toπ(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
-        let radDiff90 = π/2 - rad
+        let radDiff90 = π_2 - rad
         let logStr = radDiff90 >= 0 ? "随机弧度rad: 0 < rad < π/2" : "随机弧度rad: π/2 < rad < π"
         logger.info("\(logStr)")
         
@@ -198,7 +205,7 @@ extension GISCircle{
         let randomLat = centerLatLon.latitude > 0 ? 90 - latOffset : latOffset - 90
         
         let radOffset = asin(abs(leftLen) / desToPole)  // `超过`离极点最近的点之后，所偏移的经度
-        var lonOffset = (leftLen > 0 ? π/2 - abs(radDiff90) + radOffset : π/2 - abs(radDiff90) - radOffset) * RAD2DEG
+        var lonOffset = (leftLen > 0 ? π_2 - abs(radDiff90) + radOffset : π_2 - abs(radDiff90) - radOffset) * RAD2DEG
         lonOffset = centerLatLon.latitude > 0 ? lonOffset : -lonOffset
         
         let tempLon = radDiff90 >= 0 ? centerLatLon.longitude + lonOffset : centerLatLon.longitude - lonOffset
@@ -224,7 +231,7 @@ extension GISCircle{
      * 也就是说，圆心点在南北半球采用相反的极坐标轴，但是这并不影响我们取随机经纬度坐标，反而对编写函数提供了很大的便利。
      */
     private func rad_πTo2π(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
-        let radDiff270 = 3 * π / 2 - rad
+        let radDiff270 = π3_2 - rad
         let logStr = radDiff270 >= 0 ? "随机弧度rad: π < rad < 3π/2" : "随机弧度rad: 3π/2 < rad < 2π"
         logger.info("\(logStr)")
         

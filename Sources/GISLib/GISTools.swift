@@ -11,6 +11,9 @@ public class GISTools {
     public static func printGISParams() {
         print("\n============GISLib中使用的一些参数============")
         print("          圆周率π  ➙  \(π)")
+        print(" 　　π的1/2 (π/2)  ➙  \(π_2)")
+        print("　　π的3/2 (3π/2)  ➙  \(π3_2)")
+        print("  　  π的2倍 (2π)  ➙  \(π2)")
         print("　　   地球平均半径  ➙  \(EARTH_R)(m)")
         print("　　   地球赤道周长  ➙  \(CIRCUM)(m)")
         print("　地球赤道周长的1/4  ➙  \(CIRCUM_4)(m)")

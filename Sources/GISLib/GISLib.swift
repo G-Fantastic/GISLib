@@ -7,10 +7,16 @@
 
 /// 圆周率π
 internal let π = Double.pi
+/// π的1/2
+internal let π_2 = (π / 2).roundOff(15)
+/// π的3/2
+internal let π3_2 = (3 * π / 2).roundOff(15)
+/// π的2倍
+internal let π2 = (2 * π).roundOff(15)
 /// 地球平均半径。  单位：m（米）
 internal let EARTH_R = 6371000.0
 /// 地球赤道周长(circumference)。  单位：m（米）
-internal let CIRCUM = 2 * π * EARTH_R
+internal let CIRCUM = π2 * EARTH_R
 /// 地球赤道周长的1/4。   单位：m（米）
 internal let CIRCUM_4 = CIRCUM / 4
 /// 地球赤道周长的1/8。   单位：m（米）

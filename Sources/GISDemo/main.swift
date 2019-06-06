@@ -70,9 +70,10 @@ func testDistanceWithAltitude(){
 //testDistanceWithAltitude()
 
 
+
 fileprivate func test1(_ circle1: GISCircle) {
     do{
-        try circle1.calculateLatLon(8, 0)
+        try circle1.calculateLatLon(6.283185307179587, 0)
     }catch GISCircleError.radianOver2πError(let msg){
         print(msg)
     }catch GISCircleError.lengthOverRError(let msg){
@@ -112,12 +113,15 @@ func randomLen(_ r: Double) -> Double {
 }
 
 fileprivate func test4() {
-    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), 5000000).calculateLatLon(0, randomLen(5000000)))    // 随机弧度 = 0 或 = π
-    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), 5000000).calculateLatLon(3.141592653589793, randomLen(5000000)))  // 随机弧度 = 0 或 = π
-    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), 5000000).calculateLatLon(3.141592653589793, randomLen(5000000)))  // 随机弧度 = 0 或 = π
-    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), 5000000).calculateLatLon(0, randomLen(5000000)))   // 随机弧度 = 0 或 = π
+    // 随机弧度 = 0 或 = π
+    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), 5000000).calculateLatLon(0, randomLen(5000000)))
+    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), 5000000).calculateLatLon(3.141592653589793, randomLen(5000000)))
+    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), 5000000).calculateLatLon(3.141592653589793, randomLen(5000000)))
+    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), 5000000).calculateLatLon(0, randomLen(5000000)))
+    // 随机弧度 = π/2 或 = 3π/2
 
 }
+
 fileprivate func test5() {
     print(try! GISCircle(GISLatLon(lat: -89, lon: 0), 500000).calculateLatLon(2.01, 20))             // 圆心在极点
     print(try! GISCircle(GISLatLon(lat: 89, lon: 0), 5000).calculateLatLon(2.01, 20))
