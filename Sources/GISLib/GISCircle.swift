@@ -186,32 +186,33 @@ extension GISCircle{
      */
     private func rad_0Toπ(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
         let radDiff90 = π_2 - rad
-        let logStr = radDiff90 >= 0 ? "随机弧度rad: 0 < rad < π/2" : "随机弧度rad: π/2 < rad < π"
+        let logStr = radDiff90 > 0 ? "随机弧度rad: 0 < rad < π/2" : radDiff90 == 0 ? "随机弧度rad = π/2" :"随机弧度rad: π/2 < rad < π"
         logger.info("\(logStr)")
         
         // len等于这个距离的时候，纬度到达最高点，超过这个距离的时候，纬度又开始下降
-        let toNearestPoint = lenToPole * cos(abs(radDiff90))  // 距离极点最近的点到当前经纬度点的距离
+        let toNearestPoint = lenToPole * cos(abs(radDiff90))  // 距离极点最近的点到当前经纬度点的距离（当 = π/2时，距离极点最近的点就是极点）
         logger.info("距离极点最近的点到当前经纬度点的距离为：\(toNearestPoint)")
         
         let leftLen = len - toNearestPoint  // 超过 toNearestPoint 延伸的长度
-        let logStr1 = leftLen > 0 ? " leftLen > 0 " : leftLen == 0 ? " leftLen = 0 " : " leftLen < 0 "
-        logger.info("\(logStr1)")
+        logger.info("leftLen：\(leftLen)")
         
         let nearestPointTo90 = lenToPole * sin(abs(radDiff90))
         logger.info("当前弧度下的射线到最近的极点的距离：\(nearestPointTo90)")
         
         let desToPole = sqrt(leftLen * leftLen + nearestPointTo90 * nearestPointTo90)  // 随机点到最近极点的距离
+        logger.info("随机点到最近极点的距离：\(desToPole)")
         let latOffset = (desToPole / DEG2M).roundOff(6)
         let randomLat = centerLatLon.latitude > 0 ? 90 - latOffset : latOffset - 90
         
         let radOffset = asin(abs(leftLen) / desToPole)  // `超过`离极点最近的点之后，所偏移的经度
+        logger.info("`超过`离极点最近的点之后，经度偏移弧度：\(radOffset)")
         var lonOffset = (leftLen > 0 ? π_2 - abs(radDiff90) + radOffset : π_2 - abs(radDiff90) - radOffset) * RAD2DEG
         lonOffset = centerLatLon.latitude > 0 ? lonOffset : -lonOffset
         
         let tempLon = radDiff90 >= 0 ? centerLatLon.longitude + lonOffset : centerLatLon.longitude - lonOffset
         let randomLon = parseLonOver180(tempLon)
         
-        logger.info("经度偏移弧度：\(radOffset) *** 经度偏移角度：\(lonOffset) *** 纬度偏移角度：\(latOffset)")
+        logger.info("经度偏移角度：\(lonOffset.roundOff(6)) *** 纬度偏移角度：\(latOffset.roundOff(6))")
         logger.info("随机纬度：\(randomLat) *** 随机经度：\(randomLon)")
         
         return GISLatLon(lat: randomLat, lon: randomLon)
@@ -232,23 +233,26 @@ extension GISCircle{
      */
     private func rad_πTo2π(_ rad: Double, _ len: Double, _ lenToPole: Double) -> GISLatLon {
         let radDiff270 = π3_2 - rad
-        let logStr = radDiff270 >= 0 ? "随机弧度rad: π < rad < 3π/2" : "随机弧度rad: 3π/2 < rad < 2π"
+        let logStr = radDiff270 > 0 ? "随机弧度rad: π < rad < 3π/2" : radDiff270 == 0 ? "随机弧度rad = 3π/2" : "随机弧度rad: 3π/2 < rad < 2π"
         logger.info("\(logStr)")
         
         let cosLen = cos(abs(radDiff270)) * len
         let sinLen = sin(abs(radDiff270)) * len
+        logger.info("cosLen：\(cosLen) *** sinLen：\(sinLen)")
         
-        let desToPole = sqrt(sinLen * sinLen + pow(lenToPole + cosLen, 2))  // // 随机点到圆心所在半球的极点的距离
+        let desToPole = sqrt(sinLen * sinLen + pow(lenToPole + cosLen, 2))  // 随机点到圆心所在半球的极点的距离
+        logger.info("随机点到`圆心所在半球`的极点的距离：\(desToPole)")
         let latOffset = (desToPole / DEG2M).roundOff(6)
         let randomLat = centerLatLon.latitude > 0 ? 90 - latOffset : latOffset - 90
         
         let radOffset = asin(sinLen / desToPole)
+        logger.info("经度偏移弧度：\(radOffset)")
         let lonOffset = centerLatLon.latitude > 0 ? radOffset * RAD2DEG : -(radOffset * RAD2DEG)
         
         let tempLon = radDiff270 >= 0 ? centerLatLon.longitude - lonOffset : centerLatLon.longitude + lonOffset
         let randomLon = parseLonOver180(tempLon)
         
-        logger.info("经度偏移弧度：\(radOffset) *** 经度偏移角度：\(lonOffset) *** 纬度偏移角度：\(latOffset)")
+        logger.info("经度偏移角度：\(lonOffset.roundOff(6)) *** 纬度偏移角度：\(latOffset.roundOff(6))")
         logger.info("随机纬度：\(randomLat) *** 随机经度：\(randomLon)")
         
         return GISLatLon(lat: randomLat, lon: randomLon)

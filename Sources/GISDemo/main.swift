@@ -113,18 +113,34 @@ func randomLen(_ r: Double) -> Double {
 }
 
 fileprivate func test4() {
+    let r1 = 5000000.0
     // 随机弧度 = 0 或 = π
-    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), 5000000).calculateLatLon(0, randomLen(5000000)))
-    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), 5000000).calculateLatLon(3.141592653589793, randomLen(5000000)))
-    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), 5000000).calculateLatLon(3.141592653589793, randomLen(5000000)))
-    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), 5000000).calculateLatLon(0, randomLen(5000000)))
-    // 随机弧度 = π/2 或 = 3π/2
-
+    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), r1).calculateLatLon(0, randomLen(r1)))
+    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), r1).calculateLatLon(3.141592653589793, randomLen(r1)))
+    print(try! GISCircle(GISLatLon(lat: -77, lon: 28.3209432432), r1).calculateLatLon(3.141592653589793, randomLen(r1)))
+    print(try! GISCircle(GISLatLon(lat: 78.290932, lon: -49.903209), r1).calculateLatLon(0, randomLen(r1)))
 }
 
 fileprivate func test5() {
-    print(try! GISCircle(GISLatLon(lat: -89, lon: 0), 500000).calculateLatLon(2.01, 20))             // 圆心在极点
-    print(try! GISCircle(GISLatLon(lat: 89, lon: 0), 5000).calculateLatLon(2.01, 20))
+    let r1 = 5000000.0
+    let r2 = 10007543.0
+    // 随机弧度 = π/2 或 = 3π/2
+    print(try! GISCircle(GISLatLon(lat: -67, lon: 28.3209432432), r1).calculateLatLon(1.570796326794897, randomLen(r1)))
+    print(try! GISCircle(GISLatLon(lat: 68.290932, lon: -49.903209), r1).calculateLatLon(1.570796326794897, randomLen(r1)))
+    print(try! GISCircle(GISLatLon(lat: -50, lon: 28.3209432432), r2).calculateLatLon(4.71238898038469, randomLen(r2)))
+    print(try! GISCircle(GISLatLon(lat: 50.290932, lon: -49.903209), r2).calculateLatLon(4.71238898038469, randomLen(r2)))
+    
+}
+
+
+fileprivate func test6() {
+    
+    
+}
+
+fileprivate func test7() {
+    
+    
 }
 
 
@@ -133,13 +149,15 @@ func testRandomLatLon() {
 //    test1(circle1)  // 测试异常：radianOver2πError
 //    test2(circle1)  // 测试异常：lengthOverRError
 //    test3(circle1)  // 特殊点测试
-    test4()           // 极点在圆内
-//    test5()           // 其他常规测试
-    
+//    test4()         // 极点在圆内 随机弧度 = 0 或 = π
+//    test5()         // 极点在圆内 随机弧度 = π/2 或 = 3π/2
+    test6()           // 极点在圆内 随机弧度 (0, π)
+    test7()           // 极点在圆内 随机弧度 (π, 2π)
     
     
 }
 
+print(asin(1.0))
 
 testRandomLatLon()
 
