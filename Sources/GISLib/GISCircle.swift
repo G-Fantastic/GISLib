@@ -57,7 +57,7 @@ extension GISCircle{
      *
      */
     public func randomLatLon() throws -> GISLatLon{
-        let randomRad = Double.random(in: 0...π2).roundOff(6)    // 随机弧度（必须 <= 2π）
+        let randomRad = Double.random(in: 0...π2)    // 随机弧度（必须 <= 2π）
         let randomLen = (sqrt(Double.random(in: 0...1)) * r).roundOff(3) // 随机长度（必须 <= 圆的半径R）
         let gisLatLon = try calculateLatLon(randomRad, randomLen)
         return gisLatLon

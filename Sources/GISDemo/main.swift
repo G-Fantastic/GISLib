@@ -135,6 +135,14 @@ fileprivate func test5() {
 
 fileprivate func test6() {
     
+    let r1 = 5000000.0
+    let r2 = 10007543.0
+    let randomRad = Double.random(in: 0..<3.141592653589793)   
+    print(try! GISCircle(GISLatLon(lat: -67, lon: 28.3209432432), r1).calculateLatLon(randomRad, randomLen(r1)))
+    print(try! GISCircle(GISLatLon(lat: 68.290932, lon: -49.903209), r1).calculateLatLon(randomRad, randomLen(r1)))
+    print(try! GISCircle(GISLatLon(lat: -50, lon: 28.3209432432), r2).calculateLatLon(randomRad, randomLen(r2)))
+    print(try! GISCircle(GISLatLon(lat: 50.290932, lon: -49.903209), r2).calculateLatLon(randomRad, randomLen(r2)))
+    
     
 }
 
