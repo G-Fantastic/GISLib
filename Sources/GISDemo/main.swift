@@ -155,7 +155,47 @@ fileprivate func test6(_ range: Range<Double>) {
 }
 
 fileprivate func test7() {
+    print(try? GISCircle(GISLatLon(lat: 0, lon: 179.3209432432), 10007543.398010286).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 0, lon: 179.3209432432), 10007543.398010286).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 0, lon: 179.3209432432), 10007543.398010286).randomLatLon())
     
+    let r: Double = 5000000.0
+    print("\n圆的半径：\(r)")
+    print(try? GISCircle(GISLatLon(lat: -43.9249832432423, lon: 28.3209432432), r).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 43.9249832432423, lon: 179), r).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -35.9249832432423, lon: -179.3209432432), r).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 35.9249832432423, lon: -168.3209432432), r).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -25.9249832432423, lon: 168.3209432432), r).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 25.9249832432423, lon: 28.3209432432), r).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -10.9249832432423, lon: 28.3209432432), r).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 10.9249832432423, lon: 28.3209432432), r).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 0, lon: 28.3209432432), r).randomLatLon())
+
+    
+    let r1: Double = 1000000.0
+    print("\n圆的半径：\(r1)")
+    print(try? GISCircle(GISLatLon(lat: -80.9249832432423, lon: 28.3209432432), r1).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 80.9249832432423, lon: 179), r1).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -71.9249832432423, lon: -179.3209432432), r1).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 60.9249832432423, lon: 28.3209432432), r1).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -50.9249832432423, lon: 0), r1).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 25.9249832432423, lon: -168.3209432432), r1).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -10.9249832432423, lon: 168.3209432432), r1).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 10.9249832432423, lon: 28.3209432432), r1).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 0, lon: 28.3209432432), r1).randomLatLon())
+
+
+    let r2: Double = 500000.0
+    print("\n圆的半径：\(r2)")
+    print(try? GISCircle(GISLatLon(lat: -84.9249832432423, lon: 28.3209432432), r2).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 84.9249832432423, lon: 179), r2).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -70.9249832432423, lon: -179.3209432432), r2).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 80.9249832432423, lon: 28.3209432432), r2).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -50.9249832432423, lon: 0), r2).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 60.9249832432423, lon: -168.3209432432), r2).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: -10.9249832432423, lon: 168.3209432432), r2).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 10.9249832432423, lon: 28.3209432432), r2).randomLatLon())
+    print(try? GISCircle(GISLatLon(lat: 0, lon: 28.3209432432), r2).randomLatLon())
     
 }
 
@@ -169,6 +209,7 @@ func testRandomLatLon() {
 //    test5()         // 极点在圆内 随机弧度 = π/2 或 = 3π/2
 //    test6(0..<3.141592653589793)           // 极点在圆内 随机弧度 (0, π)
 //    test6(3.141592653589793..<6.283185307179586)           // 极点在圆内 随机弧度 (π, 2π)
+    test7() // 普通测试
     
     
 }

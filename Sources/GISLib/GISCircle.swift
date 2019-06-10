@@ -122,6 +122,9 @@ extension GISCircle{
                     logger.warning("随机弧度 > π 且 < 2π")
                     randomLatLon = rad_πTo2π(rad, len, lenToPole)
                 }
+            }else{
+                // 当 r < lenToPole，跳到 default 分支中
+                fallthrough
             }
             
         default:
