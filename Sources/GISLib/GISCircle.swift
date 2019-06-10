@@ -133,6 +133,8 @@ extension GISCircle{
             try verifyRandomLatLon(randomLatLon, len)   // 校验生成的经纬度是否有效（是否在圆内）
         }
         
+        // 第一次取精度可能会出现后面有 00000001 或 99999999 的情况，所以需要再做一次取精度的步骤
+        randomLatLon = GISLatLon(lat: randomLatLon.latitude.roundOff(6), lon: randomLatLon.longitude.roundOff(6))
         return randomLatLon
     }
     
@@ -212,7 +214,8 @@ extension GISCircle{
         let tempLon = radDiff90 >= 0 ? centerLatLon.longitude + lonOffset : centerLatLon.longitude - lonOffset
         let randomLon = parseLonOver180(tempLon)
         
-        logger.info("经度偏移角度：\(lonOffset.roundOff(6)) *** 纬度偏移角度：\(latOffset.roundOff(6))")
+        logger.info("经度偏移角度：\(lonOffset.roundOff(6))")
+        logger.info("纬度偏移角度（随机点相对于`最近的极点`）：\(latOffset.roundOff(6))")
         logger.info("随机纬度：\(randomLat) *** 随机经度：\(randomLon)")
         
         return GISLatLon(lat: randomLat, lon: randomLon)
@@ -252,7 +255,8 @@ extension GISCircle{
         let tempLon = radDiff270 >= 0 ? centerLatLon.longitude - lonOffset : centerLatLon.longitude + lonOffset
         let randomLon = parseLonOver180(tempLon)
         
-        logger.info("经度偏移角度：\(lonOffset.roundOff(6)) *** 纬度偏移角度：\(latOffset.roundOff(6))")
+        logger.info("经度偏移角度：\(lonOffset.roundOff(6))")
+        logger.info("纬度偏移角度（随机点相对于`圆心所在半球的极点`）：\(latOffset.roundOff(6))")
         logger.info("随机纬度：\(randomLat) *** 随机经度：\(randomLon)")
         
         return GISLatLon(lat: randomLat, lon: randomLon)

@@ -133,15 +133,23 @@ fileprivate func test5() {
 }
 
 
-fileprivate func test6() {
+fileprivate func test6(_ range: Range<Double>) {
     
-    let r1 = 5000000.0
-    let r2 = 10007543.0
-    let randomRad = Double.random(in: 0..<3.141592653589793)   
-    print(try! GISCircle(GISLatLon(lat: -67, lon: 28.3209432432), r1).calculateLatLon(randomRad, randomLen(r1)))
-    print(try! GISCircle(GISLatLon(lat: 68.290932, lon: -49.903209), r1).calculateLatLon(randomRad, randomLen(r1)))
-    print(try! GISCircle(GISLatLon(lat: -50, lon: 28.3209432432), r2).calculateLatLon(randomRad, randomLen(r2)))
-    print(try! GISCircle(GISLatLon(lat: 50.290932, lon: -49.903209), r2).calculateLatLon(randomRad, randomLen(r2)))
+    let r1 = 10007543.398010286
+    print(try? GISCircle(GISLatLon(lat: -67, lon: 28.3209432432), r1).calculateLatLon(Double.random(in: range), randomLen(r1)))
+    print(try? GISCircle(GISLatLon(lat: 68.290932, lon: -49.903209), r1).calculateLatLon(Double.random(in: range), randomLen(r1)))
+    print(try? GISCircle(GISLatLon(lat: -17, lon: 28.3209432432), r1).calculateLatLon(Double.random(in: range), randomLen(r1)))
+    print(try? GISCircle(GISLatLon(lat: 88.290932, lon: -179.903209), r1).calculateLatLon(Double.random(in: range), randomLen(r1)))
+    print(try? GISCircle(GISLatLon(lat: -85.90323232423, lon: 28.3209432432), r1).calculateLatLon(Double.random(in: range), randomLen(r1)))
+    print(try? GISCircle(GISLatLon(lat: 10.290932, lon: 179.903209), r1).calculateLatLon(Double.random(in: range), randomLen(r1)))
+
+    let r2 = 5007543.0
+    print(try? GISCircle(GISLatLon(lat: -50, lon: 28.3209432432), r2).calculateLatLon(Double.random(in: range), randomLen(r2)))
+    print(try? GISCircle(GISLatLon(lat: 50.290932, lon: -49.903209), r2).calculateLatLon(Double.random(in: range), randomLen(r2)))
+    print(try? GISCircle(GISLatLon(lat: -67, lon: 28.3209432432), r1).calculateLatLon(Double.random(in: range), randomLen(r2)))
+    print(try? GISCircle(GISLatLon(lat: 88.290932, lon: -179.903209), r1).calculateLatLon(Double.random(in: range), randomLen(r2)))
+    print(try? GISCircle(GISLatLon(lat: -85.90323232423, lon: 28.3209432432), r1).calculateLatLon(Double.random(in: range), randomLen(r2)))
+    print(try? GISCircle(GISLatLon(lat: 70.290932, lon: 179.903209), r1).calculateLatLon(Double.random(in: range), randomLen(r2)))
     
     
 }
@@ -159,14 +167,14 @@ func testRandomLatLon() {
 //    test3(circle1)  // 特殊点测试
 //    test4()         // 极点在圆内 随机弧度 = 0 或 = π
 //    test5()         // 极点在圆内 随机弧度 = π/2 或 = 3π/2
-    test6()           // 极点在圆内 随机弧度 (0, π)
-    test7()           // 极点在圆内 随机弧度 (π, 2π)
+//    test6(0..<3.141592653589793)           // 极点在圆内 随机弧度 (0, π)
+//    test6(3.141592653589793..<6.283185307179586)           // 极点在圆内 随机弧度 (π, 2π)
     
     
 }
 
-print(asin(1.0))
 
 testRandomLatLon()
+
 
 
